@@ -56,8 +56,6 @@ void dfs(int y, int x, int dir) {
 }
 
 void solution() {
-	//init
-	cnt = 0;
 
 	//logic
 	dfs(ry, rx, rd);
@@ -67,9 +65,12 @@ void solution() {
 }
 
 int main() {
+	//init
+	cnt = 0;
+
 	//input
 	input_data();
-
+	
 	//solve
 	solution();
 
