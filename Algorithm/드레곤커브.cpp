@@ -29,10 +29,14 @@ int main() {
 				curve.push_back((temp[k] + 1) % 4);
 			}
 		}
+
 		v[y][x] = true;
-		for (int j = 0; j < curve.size(); j++) {
-			y += dy[curve[j]];
-			x += dx[curve[j]];
+		
+		int cSize = curve.size();
+
+		for (int j = 0; j < cSize; j++) {
+			y += dy[ curve[j] ];
+			x += dx[ curve[j] ];
 			if (x < 0 || y < 0 || x > 100 || y > 100)	continue;
 			v[y][x] = true;
 		}
