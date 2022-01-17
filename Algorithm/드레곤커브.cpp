@@ -14,7 +14,7 @@ int main() {
 	int y{}, x{}, d{}, g{};
 
 	// input data
-	scanf("%d", &n);
+	cout << n;
 	for (int i = 0; i < n; i++) {
 		cin >> x >> y >> d >> g;
 
