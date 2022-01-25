@@ -7,7 +7,7 @@ int main() {
 	string board[3], input[6];
 
 	auto check = [&]() -> bool {
-		vector<bool> visited(6);
+		vector <bool> visited(6);
 		int cnt = 0;
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 6; j++) {
