@@ -10,6 +10,8 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
+#include <algorithm>
+
 
 #define SIZE 52
 
@@ -21,6 +23,8 @@ int px{}, py{};
 int dy[] = { -1,-1,-1,0,1,1,1,0 };
 int dx[] = { -1,0,1,1,1,0,-1,-1 };
 int cnt{};
+
+int myMin = 987987987;
 
 void input_data() {
 	scanf("%d", &n);
@@ -41,10 +45,28 @@ void input_data() {
 	}
 }
 
+void dfs(int y, int x, int sum ,int k) {
+	if (k == 0) {
+		myMin = min(myMin, sum);
+		return;
+	}
+	for (int i = 0; i < 8; i++) {
+		int ny = y + dy[i];
+		int nx = x + dx[i];
+		
+		if (ny < 0 || nx < 0 || ny >= n || nx >= n)	continue;
+		
+	}
+}
+
 int solution() {
-	// 모든 루트를 다 가보면서 피로도가 낮도록 계산 후 갱신
+
+	// 모든 루트를 다 가보면서 전부 돌면 return -> 이 때 순서에 따라 갱신
+	for (int i = 0; i < 8; i++) {
+		dfs(py, px, 0, cnt);
+	}
 	// 모두 순회후 돌아서 와야 함 -> 종료
-	// K는 모두 순회해야하는 조건이 있기에 cnt가 완료되면 돌아오는 순회루트 
+
 
 	return 0;
 }
