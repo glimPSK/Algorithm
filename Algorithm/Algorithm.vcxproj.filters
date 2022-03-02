@@ -117,5 +117,8 @@
     <ClCompile Include="주사위 윷놀이.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="미네랄.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
