@@ -22,11 +22,11 @@ void dfs(int y, int x) {
 
 	visited[y][x] = true;
 	group.push_back({ y,x });
+
 	for (int i = 0; i < 4; ++i) {
 		int ny = y + dy[i];
 		int nx = x + dx[i];
-		if (0 <= nx && nx < C && 0 <= ny && ny < R)
-			dfs(ny, nx);
+		if (0 <= nx && nx < C && 0 <= ny && ny < R) dfs(ny, nx);
 	}
 }
 
@@ -41,8 +41,8 @@ void solve() {
 			group.clear();
 			dfs(a, b);
 			vector<int> low(C, -1);
-			for (int i = 0; i < group.size(); ++i)
-			{
+
+			for (int i = 0; i < group.size(); ++i) {
 				auto& p = group[i];
 				//각 열마다 가장 밑에있는 행을 찾는다
 				low[p.second] = max(low[p.second], p.first);
@@ -69,8 +69,6 @@ void solve() {
 				cave[p.first][p.second] = 'x';
 				visited[p.first][p.second] = true;
 			}
-
-
 		}
 	}
 }
