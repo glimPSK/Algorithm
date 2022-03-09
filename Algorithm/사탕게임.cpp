@@ -11,16 +11,13 @@ A)	1. 사탕 색이 다른 인접한 두칸 고르기
 */
 #include <iostream>
 #include <algorithm>
-#include <cstring>
+#include <string>
 using namespace std;
 #define SIZE 52
 
 int n{};
 char map[SIZE][SIZE]{};
 bool visited[SIZE][SIZE]{};
-
-int dy[4] = { 0,0,1,-1 };
-int dx[4] = { 1,-1,0,0 };
 
 void input_data() {
 	cin >> n;
@@ -32,59 +29,52 @@ void input_data() {
 }
 
 int getMaxLength() {
-	int myMax = -1;
-
-	for (int i = 0; i < n; i++) {
-		// 행 검사
+	int maxLen = 1;
+	// 좌우 
+	for (int i = 0; i < n; i++)	{
 		int len = 1;
-		char pivot = map[i][0];
-		for (int j = 1; j < n; j++) {
-			if (pivot == map[i][j]) {
+		for (int j = 1; j < n; j++)
+			if (map[i][j - 1] == map[i][j])
 				len++;
-			}
 			else {
-				pivot = map[i][j];
+				maxLen = max(maxLen, len);
+				len = 1;
 			}
-		}
-		myMax = max(myMax, len);
-
-		// 열검사
-		len = 1;
-		pivot = map[0][i];
-		for (int j = 1; j < n; j++) {
-			if (pivot == map[j][i]) {
-				len++;
-			}
-			else {
-				pivot = map[j][i];
-			}
-		}
-		myMax = max(myMax, len);
+		maxLen = max(maxLen, len);
 	}
-	return myMax;
+	// 상하
+	for (int i = 0; i < n; i++)	{
+		int len = 1;
+		for (int j = 0; j < n - 1; j++)
+			if (map[j + 1][i] == map[j][i])
+				len++;
+			else {
+				maxLen = max(maxLen, len);
+				len = 1;
+			}
+		maxLen = max(maxLen, len);
+	}
+
+	return maxLen;
 }
 
 void solution() {
-	memset(visited, false, sizeof(visited));
-	int myMax = getMaxLength();
+	int myMax = 0;
 
 	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n; j++) {
-			visited[i][j] = true;
-			//0,0 ~ n-1,n-1 까지 돌면서 바꾸 -> 길이판단 -> 원위치
-			for (int k = 0; k < 4; k++) {
-				int ny = i + dy[k];
-				int nx = j + dx[k];
-				if (ny < 0 || nx < 0 || ny >= n || nx >= n)	continue;
-				if (!visited[ny][nx] && map[ny][nx] != map[i][j]) {
-					swap(map[ny][nx], map[i][j]);
-					myMax = max(myMax, getMaxLength());
-					swap(map[i][j], map[ny][nx]);
-				}
-			}
+		for (int j = 0; j < n - 1; j++) {
+			//양 옆 swap
+			swap(map[i][j], map[i][j + 1]);
+			myMax = max(myMax, getMaxLength());
+			swap(map[i][j], map[i][j + 1]);
+			//위 아래 swap
+			swap(map[j][i], map[j + 1][i]);
+			myMax = max(myMax, getMaxLength());
+			swap(map[j][i], map[j + 1][i]);
 		}
 	}
-	cout << myMax << endl;
+	//result
+	cout << myMax << "\n";
 }
 
 int main() {	
