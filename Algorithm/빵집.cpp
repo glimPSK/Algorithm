@@ -7,33 +7,21 @@ S)	1. 첫번째 열 : 빵집의 가스관
 	(* 단, 건물이 존재하면 파이프 설치 X)
 	4. 오른쪽, 오른쪽 위 대각선, 오른쪽 아래 대각선 연결 가능
 
-TC)
-01x.443210
-..23.x....
-
-0xx..
-.1x10
-..2..
-...x.
-...x.
-
-A)	1. R,C 입력
-	2. BFS 제일 왼쪽 제일 오른쪽 다 담기
-	3. visited check하며 진행 -> 다음에 값이 있다면 더하기 1 하고 종료
+A)	1. 오른쪽 위/오른 /오른쪽 아래 순으로 탐색 ( 재탐색 X)
+	2. dfs 사용하여 해당 거리에서 갈 수 있는 방향을 재판단 하도록 구현할 것
+	3. 빵집에 도달하게 되면 ( c == C-1 ) count++;
 */
 
 #include <iostream>
-#include <queue>
-#include <string>
 using namespace std;
 #define SIZE 10010
 
 int R{}, C{};
-int map[SIZE][SIZE]{};
-bool visited[SIZE][SIZE]{};
+int nCnt;
+int map[SIZE][510]{};
 
-
-queue <pair<int, int>> Q{};
+int dr[] = { -1,0,1 };
+int dc[] = { 1,1,1 };
 
 void input_data() {
 	char temp;
@@ -45,57 +33,40 @@ void input_data() {
 				map[i][j] = 0;
 			}
 			else if (temp == 'x') {
-				map[i][j] = -1;
+				map[i][j] = 1;
 			}
 		}
 	}
 }
 
-void bfs() {
-	int nRes{};
-
-	//init
-	for (int i = 0; i < R; i++) {
-		Q.push(make_pair(i, 0));
+bool dfs(int r, int c) {
+	if (c == C - 1) {
+		nCnt++;
+		return true;
 	}
-	nRes = 0;
-	// 오른 / 대각위 / 대각 아래 / 
-	int dy[3] = { 0, -1, 1};
-	int dx[3] = { 1, 1, 1 };
 
-	while (!Q.empty()) {
-		int y = Q.front().first;
-		int x = Q.front().second;
-		Q.pop();
-
-		for (int k = 0; k < 3; k++) {
-			int ny = y + dy[k];
-			int nx = x + dx[k];
-			if (ny < 0 || nx < 0 || ny >= R || nx >= C)	continue;
-			if (!visited[ny][nx] && map[ny][nx] != -1) {
-				Q.push(make_pair(ny, nx));
-				map[ny][nx] = map[y][x] + 1;
-				visited[ny][nx] = true;
-				if (nx == C - 1)	return;
+	map[r][c] = 1;
+	for (int k = 0; k < 3; k++) {
+		int nr = r + dr[k];
+		int nc = c + dc[k];
+		if (nr < 0 || nc < 0 || nr >= R || nc >= C)	continue;
+		if (!map[nr][nc]) {
+			if (dfs(nr, nc)) {
+				return true;
 			}
 		}
 	}
+	return false;
 }
 
 void solution() {
-	//init
-	memset(visited, false, sizeof(visited));
-	
 	//logic
-	bfs();
+	for (int i = 0; i < R; i++) {
+		dfs(i, 0);
+	}
 
 	//result
-	for (int i = 0; i < R; i++) {
-		for (int j = 0; j < C; j++) {
-			cout << map[i][j] << "\t";
-		}
-		cout << endl;
-	}
+	cout << nCnt;
 }
 
 int main() {
