@@ -10,6 +10,8 @@ S)	1. 첫번째 열 : 빵집의 가스관
 A)	1. 오른쪽 위/오른 /오른쪽 아래 순으로 탐색 ( 재탐색 X)
 	2. dfs 사용하여 해당 거리에서 갈 수 있는 방향을 재판단 하도록 구현할 것
 	3. 빵집에 도달하게 되면 ( c == C-1 ) count++;
+
++) 추가로 메모리 감소를 위해 int(4btye) -> bool(1byte) 형으로 변경 
 */
 
 #include <iostream>
@@ -18,7 +20,7 @@ using namespace std;
 
 int R{}, C{};
 int nCnt;
-int map[SIZE][510]{};
+bool map[SIZE][510]{};
 
 int dr[] = { -1,0,1 };
 int dc[] = { 1,1,1 };
@@ -30,10 +32,10 @@ void input_data() {
 		for (int j = 0; j < C; j++) {
 			cin >> temp;
 			if (temp == '.') {
-				map[i][j] = 0;
+				map[i][j] = false;
 			}
 			else if (temp == 'x') {
-				map[i][j] = 1;
+				map[i][j] = true;
 			}
 		}
 	}
@@ -45,7 +47,7 @@ bool dfs(int r, int c) {
 		return true;
 	}
 
-	map[r][c] = 1;
+	map[r][c] = true;
 	for (int k = 0; k < 3; k++) {
 		int nr = r + dr[k];
 		int nc = c + dc[k];
