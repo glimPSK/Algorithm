@@ -1,131 +1,174 @@
+/*
+Q)
+*/
+
 #include <iostream>
-#include <vector>
 #include <queue>
 #include <algorithm>
-#include <iostream>
 using namespace std;
 
-int N, M, Fuel; // Fuel: 잔여연료량
-int arr[21][21];
-int dx[4] = { 1, 0, -1, 0 };
-int dy[4] = { 0, 1, 0, -1 };
+#define SIZE 21
+#define MAX 987987987
 
-typedef struct {
-    int idx, x, y, dist, dest; // dist:택시와의 거리, dest:목적지까지의 거리
-} USER;
-vector<USER> userVec;
-vector<pair<int, int>> destVec;
-int taxiX, taxiY;
+typedef struct customer {
+    int bx, by, ax, ay;
+};
 
-bool available(int x, int y) { return x > 0 && y > 0 && x <= N && y <= N && arr[x][y] == 0; }
+customer info[400];
+int N{}, M{};
+int fuel{};
+int MAP[SIZE][SIZE]{};
+int dist[SIZE][SIZE]{};
+int dx[] = { 0,1,0,-1 };
+int dy[] = { 1,0,-1,0 };
+int taxi_x{}, taxi_y{};
+int total{};
+bool visit[410];
 
-typedef struct {
-    int x, y, d;
-} ELEM;
+queue <pair<int, int>> Q{};
 
-int get_dest_bfs(int i) {
-    queue<ELEM> bfsQ;
-    bfsQ.push(ELEM{ userVec[i].x, userVec[i].y, 0 });
-    bool visit[21][21] = { 0, };
+// 승객의 좌표를 x,y좌표 순으로 정렬
+bool cmp(customer A, customer B) {
+    if (A.bx <= B.bx) {
+        if (A.bx == B.bx) {
+            if (A.by < B.by) {
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
 
-    while (!bfsQ.empty()) {
-        ELEM qTop = bfsQ.front();
-        bfsQ.pop();
+//현재 위치에서 가장 가까운 승객을 찾음
+int find_customer() {
+    Q.push(make_pair(taxi_x, taxi_y));
 
-        if (qTop.x == destVec[i].first && qTop.y == destVec[i].second) return qTop.d;
-        else {
-            for (int j = 0; j < 4; j++) {
-                int nx = qTop.x + dx[j];
-                int ny = qTop.y + dy[j];
-                if (available(nx, ny) && !visit[nx][ny]) {
-                    bfsQ.push(ELEM{ nx, ny, qTop.d + 1 });
-                    visit[nx][ny] = true;
-                }
+    for (int i = 1; i <= N; i++)
+        for (int j = 1; j <= N; j++)
+            dist[i][j] = MAX;
+
+    dist[taxi_x][taxi_y] = 0;
+    int idx = 404;
+    int far = MAX;
+    int nx = 30;
+    int ny = 30;
+
+    //현재 택시에서 모든 좌표까지 거리 구하기
+    while (!Q.empty()) {
+        int x = Q.front().first;
+        int y = Q.front().second;
+        Q.pop();
+
+        for (int i = 0; i < 4; i++) {
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+            if (nx<1 || ny<1 || nx>N || ny>N || MAP[nx][ny] == 1) continue;
+            if (dist[nx][ny] > dist[x][y] + 1) {
+                dist[nx][ny] = dist[x][y] + 1;
+                Q.push(make_pair(nx, ny));
             }
         }
+    }
+
+    // 현재 택시 위치에서 가장 가까운 승객 찾기, 단 이미 방문한 승객은 Pass
+    for (int i = 0; i < M; i++) {
+        if (visit[i]) continue;
+
+        if (dist[info[i].bx][info[i].by] == far) {
+            if (info[i].bx < nx) {
+                nx = info[i].bx;
+                ny = info[i].by;
+                idx = i;
+            }
+            else if (info[i].bx == nx && info[i].by < ny) {
+                nx = info[i].bx;
+                ny = info[i].by;
+                idx = i;
+            }
+            else continue;
+        }
+        else if (dist[info[i].bx][info[i].by] < far) {
+            far = dist[info[i].bx][info[i].by];
+            nx = info[i].bx;
+            ny = info[i].by;
+            idx = i;
+        }
+    }
+    // 승객을  찾았다면 그 노드는 방문 표시, 택시 이동
+    visit[idx] = true;
+    taxi_x = nx, taxi_y = ny;
+    fuel -= dist[taxi_x][taxi_y];
+
+    return idx;
+}
+
+//택시가 승객의 목적지로 이동하는 함수
+void move_dest()
+{
+    for (int i = 1; i <= N; i++)
+        for (int j = 1; j <= N; j++)
+            dist[i][j] = 99999999;
+
+    Q.push(make_pair(taxi_x, taxi_y));
+    dist[taxi_x][taxi_y] = 0;
+
+    while (!Q.empty()) {
+        int x = Q.front().first;
+        int y = Q.front().second;
+        Q.pop();
+
+        for (int i = 0; i < 4; i++) {
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+            if (nx<1 || ny<1 || nx>N || ny>N || MAP[nx][ny] == 1) continue;
+            if (dist[nx][ny] > dist[x][y] + 1) {
+                dist[nx][ny] = dist[x][y] + 1;
+                Q.push(make_pair(nx, ny));
+            }
+        }
+    }
+}
+
+int solution() {
+    //init
+    total = M;
+    sort(info, info + M, cmp);
+
+    while (true) {
+        if (fuel < 0) return -1;
+        if (total == 0) return fuel;
+        int idx = find_customer();
+        if (idx == 404) return -1;
+        move_dest();
+        if (fuel < dist[info[idx].ax][info[idx].ay]) return -1; //만약 연료 부족하면 -1리턴 그렇지 않다면 연료 충전
+        fuel += dist[info[idx].ax][info[idx].ay];
+        taxi_x = info[idx].ax, taxi_y = info[idx].ay;
+        total--;
     }
     return -1;
 }
 
-void get_dist_to_dest() {
-    // 각 손님의 위치에서부터 목적지까지의 거리를 미리 계산
-    for (int i = 0; i < M; i++) {
-        userVec[i].dest = get_dest_bfs(i);
-    }
+void input_data() {
+    cin >> N >> M >> fuel;
+    for (int i = 1; i <= N; i++)
+        for (int j = 1; j <= N; j++)
+            cin >> MAP[i][j];
+
+    cin >> taxi_x >> taxi_y;
+
+    for (int i = 0; i < M; i++)
+        cin >> info[i].bx >> info[i].by >> info[i].ax >> info[i].ay;
+
 }
-
-int get_taxi_dist_bfs(int i) {
-    queue<ELEM> bfsQ;
-    bfsQ.push(ELEM{ userVec[i].x, userVec[i].y, 0 });
-    bool visit[21][21] = { 0, };
-
-    while (!bfsQ.empty()) {
-        ELEM qTop = bfsQ.front();
-        bfsQ.pop();
-
-        if (qTop.x == taxiX && qTop.y == taxiY) return qTop.d;
-        else {
-            for (int j = 0; j < 4; j++) {
-                int nx = qTop.x + dx[j];
-                int ny = qTop.y + dy[j];
-                if (available(nx, ny) && !visit[nx][ny]) {
-                    bfsQ.push(ELEM{ nx, ny, qTop.d + 1 });
-                    visit[nx][ny] = true;
-                }
-            }
-        }
-    }
-    return -1;
-}
-
-bool cmp_user(USER& u1, USER& u2) {
-    if (u1.dist == u2.dist && u1.x == u2.x) return u1.y < u2.y;
-    else if (u1.dist == u2.dist) return u1.x < u2.x;
-    else return u1.dist < u2.dist;
-}
-
-int start_taxi() {
-    for (int i = 0; i < M; i++) {
-        // 1. BFS로 택시 to 시민거리 모두 구함
-        for (int j = 0; j < userVec.size(); j++) userVec[j].dist = get_taxi_dist_bfs(j);
-        // 2. 택시-시민거리, 행번호, 열번호 순으로 정렬
-        sort(userVec.begin(), userVec.end(), cmp_user);
-        // 3. 잔여 연료량 체크해서 나머지 목적지까지 도달 못하면 -1 반환
-        if (userVec.front().dist + userVec.front().dest > Fuel) return -1;
-        else if (userVec.front().dist == -1) return -1; // 반례: 도달 불가능한 목적지가 하나라도 있다면 완전한 택시영업 불가능
-        else {
-            // 4. 도달 가능하면 잔여연료량 업데이트 후 나머지 순회
-            taxiX = destVec[userVec.front().idx].first;
-            taxiY = destVec[userVec.front().idx].second;
-            Fuel = Fuel - userVec.front().dist + userVec.front().dest;
-            reverse(userVec.begin(), userVec.end());
-            userVec.pop_back();
-        }
-    }
-    return Fuel;
-}
-
 int main() {
-    cin >> N >> M >> Fuel;
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            cin >> arr[i + 1][j + 1];
-        }
-    }
-    cin >> taxiX >> taxiY;
+    //input
+    input_data();
 
-    for (int i = 0; i < M; i++) {
-        USER user;
-        cin >> user.x >> user.y;
-        user.idx = i;
-        userVec.push_back(user);
-        int destX, destY;
-        cin >> destX >> destY;
-        destVec.push_back(pair<int, int>(destX, destY));
-    }
-
-    get_dist_to_dest();
-    cout << start_taxi() << endl;
+    //solution
+    cout << solution();
 
     return 0;
+
 }
