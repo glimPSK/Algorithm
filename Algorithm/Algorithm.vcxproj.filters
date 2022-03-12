@@ -138,5 +138,8 @@
     <ClCompile Include="양.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="스타트택시.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
