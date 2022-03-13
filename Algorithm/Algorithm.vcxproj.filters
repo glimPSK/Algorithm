@@ -141,5 +141,8 @@
     <ClCompile Include="스타트택시.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="컨베이어벨트위의로봇.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
