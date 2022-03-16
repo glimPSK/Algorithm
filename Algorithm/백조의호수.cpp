@@ -1,152 +1,116 @@
-/*
-Q)   며칠이 지나야 백조들이 만날 수 있는지 계산
-
-S)  1. R x C 행렬
-    2. 물 공간과 접촉한 모든 빙판 공간은 녹는다. (대각선 고려 X)
-    3 물 . / 빙판 X / 백조 L
-
-A)  1. 백조 위치 파악
-    2. 만날 수 있는지 없는지 판단
-    3. (먼저 빙판을 모두 큐에 넣고 bfs) 빙판 녹이기 -> 상하좌우 물과 닿으면 큐에서 제거
-
-*/
-
 #include <iostream>
-#include <queue>
 #include <vector>
-#include <cstring>
+#include <string>
 #include <queue>
 using namespace std;
 
 #define SIZE 1505
 
 int R{}, C{};
-int nDay{};
-char map[SIZE][SIZE]{};
+string lake[SIZE];
 bool visited[SIZE][SIZE]{};
-bool check[SIZE][SIZE]{};
 
-vector <pair<int, int>> ice{};
 vector <pair<int, int>> swan{};
+queue <pair<int, int>> water{};
+queue<pair<int, int>> q{};
 
 int dy[] = { 0,0,1,-1 };
 int dx[] = { 1,-1,0,0 };
 
-void input_data() {
-    cin >> R >> C;
-    for (int i = 0; i < R; i++) {
-        for (int j = 0; j < C; j++) {
-            cin >> map[i][j];
-            //init
-            if (map[i][j] == 'X') {
-                ice.push_back(make_pair(i, j));
-            }
-            else if (map[i][j] == 'L') {
-                swan.push_back(make_pair(i, j));
-            }
-        }
-    }
-}
-
-bool isContact() {
-    queue <pair<int, int>> q{};
-
-    //init
-    memset(visited, false, sizeof(visited));
-    visited[swan[0].first][swan[0].second] = true;
-    q.push(make_pair(swan[0].first, swan[0].second));
-
-    while (!q.empty()) {
-        int y = q.front().first;
-        int x = q.front().second;
-        q.pop();
-
-        if (y == swan[1].first && x == swan[1].second) {
-            return true;
-        }
-
-        for (int k = 0; k < 4; k++) {
-            int ny = y + dy[k];
-            int nx = x + dx[k];
-
-            if (ny < 0 || nx < 0 || ny >= R || nx >= C) continue;
-            if (!visited[ny][nx] && map[ny][nx] == '.') {
-                q.push(make_pair(ny, nx));
-                visited[ny][nx] = true;
-            }
-        }
-    }
-    return false;
-}
-
-void melting() {
-    vector <pair<int, int>>::iterator iter{};
-
-    //init
-    memset(check, false, sizeof(check));
-
-    // 물이 하나라도 있으면 check
-    for (iter = ice.begin(); iter != ice.end(); iter++) {
-        int y = (*iter).first;
-        int x = (*iter).second;
-
-        for (int k = 0; k < 4; k++) {
-            int ny = y + dy[k];
-            int nx = x + dx[k];
-
-            if (ny < 0 || nx < 0 || ny >= R || nx >= C) continue;
-            if (map[ny][nx] == '.') {
-                check[y][x] = true;
-                break;
-            }
-        }
-    }
-
-    // check[][] == true인것, 맵에서도 변경하고, ice에서 삭제
-    for (int i = 0; i < R; i++) {
-        for (int j = 0; j < C; j++) {
-            if (check[i][j]) {
-                for (iter = ice.begin(); iter != ice.end(); iter++) {
-                    if ((*iter).first == i && (*iter).second == j) {
-                        map[i][j] = '.';
-                        ice.erase(iter);
-                        break;
-                    }
-                }
-            }
-        }
-    }
-}
-
 void solution() {
-    while (true) {
-        if (isContact()) {
-            cout << nDay << endl;
-            return;
-        }
-        melting();
-        nDay++;
+	q.push(swan[0]);
 
-        
-        for (int i = 0; i < R; i++) {
-            for (int j = 0; j < C; j++) {
-                cout << map[i][j];
-            }
-            cout << endl;
-        }
-        cout << endl << endl;
-        
-    }
+	visited[swan[0].first][swan[0].second] = true;
+
+	int day = 0;
+
+	while (true) {
+		queue<pair<int, int>> next_q{};
+		bool flag = false;
+		while (!q.empty()) {
+			int y = q.front().first;
+			int x = q.front().second;
+			q.pop();
+
+			if (y == swan[1].first && x == swan[1].second) {
+				flag = true;
+				break;
+			}
+
+			for (int i = 0; i < 4; i++) {
+				int nextY = y + dy[i];
+				int nextX = x + dx[i];
+
+				if (nextY < 0 || nextY >= R || nextX < 0 || nextX >= C || visited[nextY][nextX]) continue;
+
+				visited[nextY][nextX] = true;
+
+				// 물에 인접한 얼음이므로 다음 날에 백조가 탐색할 곳이므로 nextQ에 넣어준다
+				if (lake[nextY][nextX] == 'X') {
+					next_q.push({ nextY, nextX });
+					continue;
+				}
+
+				q.push({ nextY, nextX });
+			}
+		}
+
+		if (flag)
+			break;
+
+		q = next_q;
+
+		// 얼음을 녹이는 과정
+		size_t waterSize = water.size();
+		while (waterSize--)
+		{
+			int y = water.front().first;
+			int x = water.front().second;
+			water.pop();
+
+			for (int i = 0; i < 4; i++)
+			{
+				int nextY = y + dy[i];
+				int nextX = x + dx[i];
+
+				if (nextY < 0 || nextY >= R || nextX < 0 || nextX >= C)
+				{
+					continue;
+				}
+
+				if (lake[nextY][nextX] == 'X')
+				{
+					lake[nextY][nextX] = '.';
+					water.push({ nextY, nextX });
+				}
+			}
+		}
+
+		day++;
+	}
+	//result
+	cout << day << "\n";
 }
 
-int main() {
-    //init
-    nDay = 0;
+void input_data() {
+	cin >> R >> C;
 
-    //input
-    input_data();
+	for (int i = 0; i < R; i++) {
+		cin >> lake[i];
 
-    //solution
-    solution();
-    return 0;
+		for (int j = 0; j < C; j++) {
+			if (lake[i][j] == 'L') {
+				swan.push_back({ i, j });
+			}
+			if (lake[i][j] == '.' || lake[i][j] == 'L') {
+				water.push({ i, j });
+			}
+		}
+	}
+}
+
+int main(void) {
+	input_data();
+	solution();
+	return 0;
 }
