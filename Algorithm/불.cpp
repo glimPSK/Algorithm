@@ -104,10 +104,12 @@ void input_data() {
 
 void solution() {
     int result = bfs();
-    if (result == -1)
-        cout << "IMPOSSIBLE\n";
-    else
-        cout << result << "\n";
+    if (result == -1) {
+        cout << "IMPOSSIBLE" << endl;
+    }
+    else {
+        cout << result << endl;
+    }
 }
 
 
