@@ -171,5 +171,8 @@
     <ClCompile Include="레이저통신.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="나이트의이동.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
