@@ -174,5 +174,8 @@
     <ClCompile Include="나이트의이동.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="페그솔리테어.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
