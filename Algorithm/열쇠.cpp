@@ -18,6 +18,7 @@ A)	1. tcÀÔ·Â
 #include <iostream>
 #include <queue>
 #include <string>
+#include <cstring>
 using namespace std;
 #define SIZE 110
 
@@ -47,7 +48,7 @@ void bfs() {
             int ny = y + dy[i];
             int nx = x + dx[i];
 
-            if (ny < 0 || ny >= H || nx < 0 || nx >= W) continue;
+            if (ny < 0 || ny > H+1 || nx < 0 || nx > W+1) continue;
             if (map[ny][nx] == '*') continue;
             if (visited[ny][nx]) continue;
 
@@ -68,8 +69,8 @@ void bfs() {
             else if (map[ny][nx] >= 'a' && map[ny][nx] <= 'z') {
                 int idx = map[ny][nx] - 'a';
                 key[idx] = true;
-
-                for (int i = 0; i < door.size(); i++) {
+                size_t size = door.size();
+                for (int i = 0; i < size; i++) {
                     int py = door[i].first;
                     int px = door[i].second;
 
@@ -105,8 +106,8 @@ void bfs() {
 
 void input_data() {
 	cin >> H >> W;
-	for (int i = 0; i < H; i++) {
-		for (int j = 0; j < W; j++) {
+	for (int i = 1; i <= H; i++) {
+		for (int j = 1; j <= W; j++) {
 			cin >> map[i][j];
 		}
 	}
@@ -115,7 +116,8 @@ void input_data() {
 
 void solution() {
     if (input_key != "0") {
-        for (int i = 0; i < input_key.size(); i++) {
+        int size = input_key.size();
+        for (int i = 0; i < size; i++) {
             key[input_key[i] - 'a'] = true;
         }
     }
