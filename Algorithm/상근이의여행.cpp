@@ -11,52 +11,22 @@ A)	1. N M 입력
 */
 
 #include <iostream>
-#include <vector>
-#include <queue>
 using namespace std;
 
-#define SIZE 1010
-#define INF 987987987
-
 int N{}, M{};
-vector <int> v[SIZE]{};
-bool check[SIZE]{};
 
 void input_data() {
 	cin >> N >> M;
-	for (int i = 1; i <= N; i++) {
-		v[i].clear();
-		check[i] = false;
-	}
 	for (int i = 0; i < M; i++) {
 		int a{}, b{};
 		cin >> a >> b;
-		v[a].push_back(b);
-		v[b].push_back(a);
 	}
 }
 
 void solution() {
-	int nRes = 0;
-	queue <int> q{};
-
-	q.push(1);
-	check[1] = true;
-	while (!q.empty()) {
-		int cidx = q.front();
-		q.pop();
-
-		size_t size = v[cidx].size();
-		for (int i = 0; i < size; i++) {
-			int next = v[cidx][i];
-			if (!check[next]) {
-				check[next] = true;
-				nRes++;
-				q.push(next);
-			}
-		}
-	}
-	cout << nRes << endl;
+	// 모든 노드 연결 + 가중치 X
+	// -> MST -> Node-1 = O(1)
+	cout << N - 1 << endl;
 }
 
 
