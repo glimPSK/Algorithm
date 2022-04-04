@@ -186,5 +186,8 @@
     <ClCompile Include="탈옥.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="NxM보드완주하기.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
