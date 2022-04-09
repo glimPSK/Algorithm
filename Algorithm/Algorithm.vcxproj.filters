@@ -198,5 +198,8 @@
     <ClCompile Include="상어초등학교.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="상어중학교.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
