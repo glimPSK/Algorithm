@@ -10,18 +10,16 @@ const int EMPTY = -2;
 const int BLACK = -1;
 const int RAINBOW = 0;
 
-typedef struct
-{
+typedef struct {
 	int y, x;
-} Coord;
+} S_POS;
 
-typedef struct
-{
-	Coord baseBlock;
-	Coord arr[MAX * MAX];
+typedef struct {
+	S_POS baseBlock;
+	S_POS arr[MAX * MAX];
 	int blockGroupSize;
 	int rainbowCnt;
-} BlockGroup;
+} S_BLACK;
 
 int N{}, M{};
 int board[MAX][MAX];
@@ -85,10 +83,10 @@ void rotateBoard() {
 	}
 }
 
-BlockGroup getBlockGroup(int y, int x, int color) {
-	BlockGroup tempBlockGroup;
-	tempBlockGroup.baseBlock = { INF, INF };
-	tempBlockGroup.rainbowCnt = 0;
+S_BLACK getS_BLACK(int y, int x, int color) {
+	S_BLACK tempS_BLACK;
+	tempS_BLACK.baseBlock = { INF, INF };
+	tempS_BLACK.rainbowCnt = 0;
 
 	int baseColor = board[y][x] == RAINBOW ? color : board[y][x];
 
@@ -100,7 +98,7 @@ BlockGroup getBlockGroup(int y, int x, int color) {
 		}
 	}
 
-	queue<Coord> q;
+	queue<S_POS> q;
 	q.push({ y, x });
 	visited[y][x] = true;
 	int arrIdx = 0;
@@ -113,20 +111,20 @@ BlockGroup getBlockGroup(int y, int x, int color) {
 		// 무지개블록 수
 		if (board[curY][curX] == RAINBOW)
 		{
-			tempBlockGroup.rainbowCnt++;
+			tempS_BLACK.rainbowCnt++;
 		}
 
 		// 기준 블록은 무지개 블록이 아닌 블록 중에서 행의 번호가 가장 작은 블록,
 		// 그러한 블록이 여러개면 열의 번호가 가장 작은 블록이다.
 		if (board[curY][curX] != RAINBOW
-			&& (tempBlockGroup.baseBlock.y > curY
-				|| (tempBlockGroup.baseBlock.y == curY && tempBlockGroup.baseBlock.x > curX)))
+			&& (tempS_BLACK.baseBlock.y > curY
+				|| (tempS_BLACK.baseBlock.y == curY && tempS_BLACK.baseBlock.x > curX)))
 		{
-			tempBlockGroup.baseBlock = { curY, curX };
+			tempS_BLACK.baseBlock = { curY, curX };
 		}
 
 		// 블록을 그룹에 추가
-		tempBlockGroup.arr[arrIdx++] = { curY, curX };
+		tempS_BLACK.arr[arrIdx++] = { curY, curX };
 
 		for (int k = 0; k < 4; k++) {
 			int nextY = curY + dy[k];
@@ -142,16 +140,16 @@ BlockGroup getBlockGroup(int y, int x, int color) {
 		}
 	}
 
-	tempBlockGroup.blockGroupSize = arrIdx;
-	if (tempBlockGroup.rainbowCnt == arrIdx) {
-		tempBlockGroup.blockGroupSize = 0;
+	tempS_BLACK.blockGroupSize = arrIdx;
+	if (tempS_BLACK.rainbowCnt == arrIdx) {
+		tempS_BLACK.blockGroupSize = 0;
 	}
 
-	return tempBlockGroup;
+	return tempS_BLACK;
 }
 
 int getScore() {
-	BlockGroup blockGroup;
+	S_BLACK blockGroup;
 	blockGroup.rainbowCnt = 0;
 	blockGroup.blockGroupSize = 0;
 	blockGroup.baseBlock = { INF, INF };
@@ -166,33 +164,33 @@ int getScore() {
 			for (int color = 1; color <= M; color++) {
 				memset(visited, false, sizeof(visited));
 
-				BlockGroup tempBlockGroup = getBlockGroup(y, x, color);
+				S_BLACK tempS_BLACK = getS_BLACK(y, x, color);
 
-				if (tempBlockGroup.blockGroupSize < 2) {
+				if (tempS_BLACK.blockGroupSize < 2) {
 					continue;
 				}
 
 				// 크기가 가장 큰 블록 그룹을 찾는다
-				if (tempBlockGroup.blockGroupSize > blockGroup.blockGroupSize) {
-					blockGroup = tempBlockGroup;
+				if (tempS_BLACK.blockGroupSize > blockGroup.blockGroupSize) {
+					blockGroup = tempS_BLACK;
 
 					continue;
 				}
 
 				// 그러한 블록 그룹이 여러 개라면 포함된 무지개 블록의 수가 가장 많은 블록 그룹
-				if (tempBlockGroup.blockGroupSize == blockGroup.blockGroupSize)	{
-					if (tempBlockGroup.rainbowCnt > blockGroup.rainbowCnt) {
-						blockGroup = tempBlockGroup;
+				if (tempS_BLACK.blockGroupSize == blockGroup.blockGroupSize)	{
+					if (tempS_BLACK.rainbowCnt > blockGroup.rainbowCnt) {
+						blockGroup = tempS_BLACK;
 
 						continue;
 					}
 
 					// 그러한 블록도 여러개라면 기준 블록의 행이 가장 큰 것을, 그 것도 여러개이면 열이 가장 큰 것을 찾는다
-					if (tempBlockGroup.rainbowCnt == blockGroup.rainbowCnt)	{
-						if (blockGroup.baseBlock.y < tempBlockGroup.baseBlock.y
-							|| (blockGroup.baseBlock.y == tempBlockGroup.baseBlock.y
-								&& blockGroup.baseBlock.x < tempBlockGroup.baseBlock.x)) {
-							blockGroup = tempBlockGroup;
+					if (tempS_BLACK.rainbowCnt == blockGroup.rainbowCnt)	{
+						if (blockGroup.baseBlock.y < tempS_BLACK.baseBlock.y
+							|| (blockGroup.baseBlock.y == tempS_BLACK.baseBlock.y
+								&& blockGroup.baseBlock.x < tempS_BLACK.baseBlock.x)) {
+							blockGroup = tempS_BLACK;
 						}
 					}
 				}
