@@ -210,5 +210,8 @@
     <ClCompile Include="마법사 상어와 비바라기.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="주사위 굴리기2.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
