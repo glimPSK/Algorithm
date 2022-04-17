@@ -215,18 +215,11 @@ void solution() {
     cout << findAnswer() << endl;
 }
 
-void solve() {
-    input();
-    solution();
-}
 
 int main(void) {
-    ios::sync_with_stdio(false);
-    cin.tie(NULL);
-    cout.tie(NULL);
 
-    //    freopen("Input.txt", "r", stdin);
-    solve();
+    input();
+    solution();
 
     return 0;
 }
